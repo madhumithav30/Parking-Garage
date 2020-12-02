@@ -1,0 +1,72 @@
+#include<ESP8266WiFi.h>
+ #include<Servo.h>
+ Servo s;
+ int angle=0;
+ 
+#include"Adafruit_MQTT_Client.h"
+#define wifi "********"   // Enter the wifi name
+#define password "********"    //Enter the password that was assigned for your hotspot
+#define server "io.adafruit.com"
+#define port 1883
+#define username "**********"     // Enter the username
+#define key "***************************"   // Enter the key in Adafruit
+WiFiClient esp;
+Adafruit_MQTT_Client mqtt(&esp,server,port,username,key);
+Adafruit_MQTT_Subscribe feed=Adafruit_MQTT_Subscribe(&mqtt,username"/feeds/googleass");
+
+void setup()
+{   pinMode(16,OUTPUT);
+    digitalWrite(16,HIGH);
+    s.attach(16);
+    s.write(angle);
+
+  Serial.begin(115200);
+  delay(10);
+  Serial.println("Adafruit MQTT demo");
+  Serial.print("Connecting to");
+  Serial.println(wifi);
+  WiFi.begin(wifi,password);
+  
+  while(WiFi.status()!=WL_CONNECTED)
+  { delay(500);
+    Serial.print(".");
+  }
+  Serial.println();
+  Serial.println("WiFi connected");
+  Serial.println("IP address:");
+  Serial.println(WiFi.localIP());
+  mqtt.subscribe(&feed);
+  Serial.print("Connecting to MQTT");
+  while(mqtt.connect())
+  { delay(500);
+    Serial.print(".");
+  }
+  
+}
+
+void loop()
+{ Adafruit_MQTT_Subscribe *subs;
+  Serial.println("inside loop");
+  while(subs==mqtt.readSubscription(5000))
+  {
+    Serial.println("while loop");
+    Serial.print("Got:");
+    Serial.print((char *)feed.lastread);
+    int a=atoi((char *)feed.lastread);
+    Serial.print(" ");
+    Serial.println(a);
+    if(a==0)
+    { digitalWrite(16,HIGH);
+     s.write(0);
+     delay(20);
+     
+    }
+    else if(a==1)
+    {    digitalWrite(16,LOW);
+          s.write(180);
+         delay(20);
+               
+                 
+    }
+  }
+}
