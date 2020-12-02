@@ -12,7 +12,7 @@
 #define key "***************************"   // Enter the key in Adafruit
 WiFiClient esp;
 Adafruit_MQTT_Client mqtt(&esp,server,port,username,key);
-Adafruit_MQTT_Subscribe feed=Adafruit_MQTT_Subscribe(&mqtt,username"/feeds/googleass");
+Adafruit_MQTT_Subscribe feed=Adafruit_MQTT_Subscribe(&mqtt,username"/feeds/*********");  // Enter the folder destination
 
 void setup()
 {   pinMode(16,OUTPUT);
